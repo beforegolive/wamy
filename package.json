@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "tm": "./scripts/index.js"
+    "tm": "./bin/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "commander": "^2.15.1"
+    "commander": "^2.15.1",
+    "gulp": "^3.9.1"
   }
 }
