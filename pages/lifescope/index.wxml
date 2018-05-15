@@ -1,0 +1,5 @@
+<!--pages/lifescope/index.wxml-->
+<text>pages/lifescope/index.wxml</text>
+<navigator url='../index/index'>跳回首页</navigator>
+<navigator url='../tab1/index' open-type='switchTab'>跳到Tab1页</navigator>
+<navigator url='../tab1/index' open-type='reLaunch'>重启Tab1页</navigator>

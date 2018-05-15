@@ -1,0 +1,13 @@
+<!--pages/customComponent/index.wxml-->
+<text>pages/customComponent/index.wxml</text>
+<text>用了自定义组件</text>
+<view>
+  <text>myName: {{myName}}</text>
+</view>
+<view>
+	<button bindtap='clickButton'>dispatch 一个 action</button>
+	<text>valueOfReducer1:{{valueOfReducer1}}</text>
+</view>
+<view>
+  <navigator url="../reduxPage/index">跳转到reduxPage</navigator>
+</view>

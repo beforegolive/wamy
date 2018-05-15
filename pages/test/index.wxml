@@ -1,0 +1,9 @@
+<!--pages/test/index.wxml-->
+<text>pages/test/index.wxml</text>
+<navigator url='../index/index'>回首页</navigator>
+<view>
+  <text>from globalData: {{name}}</text>
+</view>
+<view>
+  <text>from page data: {{pageName}}</text>
+</view>

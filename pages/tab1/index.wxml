@@ -1,0 +1,9 @@
+<!--pages/tab1/index.wxml-->
+<text>pages/tab1/index.wxml</text>
+<navigator open-type="navigateBack">回退</navigator>
+<view>
+	<text>reducer1: {{valueOfReducer1}}</text>
+</view>
+<view>
+	<text>reducer2: {{valueOfReducer2}}</text>
+</view>
