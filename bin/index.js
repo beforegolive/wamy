@@ -3,7 +3,8 @@
 let program = require('commander')
 let gulp = require('gulp')
 
-require('../gulpfile')
+require('./scripts/gulpfile')
+require('./scripts/jsHandler')
 
 program
   .command('init')
@@ -22,10 +23,10 @@ program
   // .description('编译当前项目')
   .option('-b, --blue', 'is blue')
   .action(function(options) {
-    gulp.parallel('config', 'ignore', function(){
-      console.log('gulp tasks done.')
+    gulp.parallel('config', 'ignore', 'js', function(){
+      
     })()
-    return gulp.src(['**/*.js',
+    return gulp.src([
     '**/*.json',
     '**/*.wxml',
     '**/*.wxss',

@@ -1,4 +1,6 @@
 // pages/test/index.js
+// require("../../lib/babel-polyfill")
+
 Page({
 
   /**
@@ -11,8 +13,15 @@ Page({
 
 })
 
-// export default class {
-//   data = {
-//     name: 123
-//   }
-// }
+class A {
+  myName(){}
+  data=123
+}
+
+class B extends A {
+  static data={myName:'abc'}
+
+  // async customLoad(){
+  //   console.log('=== customLoad:',)
+  // }
+}
