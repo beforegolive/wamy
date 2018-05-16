@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "tm": "./bin/index.js"
+    "wamy": "./bin/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,10 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^2.15.1",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-jsbeautifier": "^2.1.2",
-    "through": "^2.3.8",
-    "through2": "^2.0.3",
-    "vinyl-map": "^1.0.2"
+    "through2": "^2.0.3"
   }
 }

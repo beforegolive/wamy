@@ -1,16 +1,22 @@
 var fs = require('fs')
 var gulp = require('gulp')
 var prettify = require('gulp-jsbeautifier')
-var through = require('through')
 var through2 = require('through2')
-var map = require('vinyl-map')
 
 const compiledFolder = '_dist/'
 
 gulp.task('config', function() {
   const updateConfig = through2.obj(function(chunk, env, callback) {
-    let content = chunk.contents.toString()
-    let json = JSON.parse(content)
+		let contents
+		let json
+		try{
+			contents = chunk.contents.toString()
+			json = JSON.parse(contents)
+		} catch(e){
+			console.error('Error: an error occurs when converting file content to json object')
+			throw e
+		}
+
     json.miniprogramRoot = compiledFolder
 
     chunk.contents = Buffer.from(JSON.stringify(json))

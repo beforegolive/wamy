@@ -3,21 +3,7 @@
 let program = require('commander')
 let gulp = require('gulp')
 
-program.version('1.0.0')
-
-const editOrCreateJsonFile = path => {
-  var fs = require('fs')
-
-  var result = JSON.parse(fs.readFileSync(path))
-  result.miniprogramRoot = './_dist'
-  // "miniprogramRoot": "./dist",
-  console.log('====== result:', result)
-  fs.writeFile(path, JSON.stringify(result), 'utf8', ()=>{
-    console.log('====== write success')
-  });
-}
-
-editOrCreateJsonFile('./project.config.json')
+require('../gulpfile')
 
 program
   .command('init')
@@ -36,18 +22,9 @@ program
   // .description('编译当前项目')
   .option('-b, --blue', 'is blue')
   .action(function(options) {
-    // console.log('build start:', options)
-    // console.log('dir: ', dir)
-    // console.log('cmd: ',cmd)
-    let appConfig = require('./../app.json')
-    let fs = require('fs')
-    fs.readFile('./.gitignore', 'utf8', function (err,data) {
-      if (err) {
-        return console.log(err);
-      }
-      console.log(data);
-    });
-    // console.log('====== appConfig:', appConfig)
+    gulp.parallel('config', 'ignore', function(){
+      console.log('gulp tasks done.')
+    })()
     return gulp.src(['**/*.js',
     '**/*.json',
     '**/*.wxml',
