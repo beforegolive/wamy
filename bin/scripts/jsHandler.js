@@ -68,7 +68,6 @@ gulp.task('extract_require', function(done) {
 
   dependencies.forEach(item => {
     try {
-      console.log(item)
       let dep = require(item)
       let content = `module.exports = require('${item}')`
       fs.writeFileSync(`${npmFolder}/${item}.js`, content)
