@@ -23,23 +23,9 @@ program
   // .description('编译当前项目')
   .option('-b, --blue', 'is blue')
   .action(function(options) {
-    gulp.parallel('config', 'ignore', 'js', function(){
-      
+    gulp.series('js', 'notjs', function(done){
+      done()
     })()
-    return gulp.src([
-    '**/*.json',
-    '**/*.wxml',
-    '**/*.wxss',
-    '**/*.png',
-    '**/*.jpg',
-    '**/*.gif',
-    '!node_modules/**',
-    '!_dist/**',
-    '!project.config.json',
-    '!package.json',
-    '!package-lock.json'
-  ]).pipe(gulp.dest('./_dist/'))
-    // return gulp.src('**/*.wxml').pipe(gulp.dest('./_dist/'))
   })
 
 program.parse(process.argv)

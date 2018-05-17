@@ -12,4 +12,4 @@ function* mySaga(){
 	yield takeEvery('sagaAction', dispathTwoActions)
 }
 
-export default mySaga
+// export default mySaga

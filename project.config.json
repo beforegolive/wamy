@@ -2,7 +2,7 @@
   "description": "A WePY project",
   "setting": {
     "urlCheck": true,
-    "es6": false,
+    "es6": true,
     "postcss": false,
     "minified": false,
     "newFeature": true
@@ -10,6 +10,6 @@
   "compileType": "miniprogram",
   "appid": "wxc4af2289733a9e1d",
   "projectname": "first-wamy",
-  "miniprogramRoot": "_dist/",
-  "condition": {}
+  "condition": {},
+  "miniprogramRoot": "_dist/"
 }
