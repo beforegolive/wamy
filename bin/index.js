@@ -13,8 +13,6 @@ program
   .option('-r, --red', 'is red')
   .action(function() {
     console.log('init start')
-    // console.log('dir: ',dir)
-    // console.log('cmd: ',cmd)
   })
 
 program
@@ -30,34 +28,34 @@ program
         console.log('======= now is watch mode',)
       }
 
-      // gulp.watch([
-      //   '**/*.json',
-      //   '**/*.wxml',
-      //   '**/*.wxss',
-      //   '**/*.png',
-      //   '**/*.jpg',
-      //   '**/*.gif',
-      //   '!node_modules/**',
-      //   '!_dist/**',
-      //   '!project.config.json',
-      //   '!package.json',
-      //   '!package-lock.json'
-      // ], gulp.series('notjs'), function(done){
-      //   console.log('==== notjs updated',)
-      //   done()
-      // })
-
       gulp.watch([
-        '**/*.js',
-        '!bin/**',
+        '**/*.json',
+        '**/*.wxml',
+        '**/*.wxss',
+        '**/*.png',
+        '**/*.jpg',
+        '**/*.gif',
         '!node_modules/**',
         '!_dist/**',
-        '!gulpfile.js',
-        '!webpack.config.js'
-      ], gulp.series('js'), function(done){
-        console.log('========= js updated',)
+        '!project.config.json',
+        '!package.json',
+        '!package-lock.json'
+      ], gulp.series('notjs'), function(done){
+        console.log('==== notjs updated',)
         done()
       })
+
+      // gulp.watch([
+      //   '**/*.js',
+      //   '!bin/**',
+      //   '!node_modules/**',
+      //   '!_dist/**',
+      //   '!gulpfile.js',
+      //   '!webpack.config.js'
+      // ], gulp.series('js'), function(done){
+      //   console.log('========= js updated',)
+      //   done()
+      // })
     })()
   })
 

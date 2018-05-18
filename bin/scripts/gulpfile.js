@@ -17,7 +17,7 @@ gulp.task('config', function() {
 			throw e
 		}
 
-    json.miniprogramRoot = compiledFolder
+    json.miniprogramRoot = '_dist/'
 
     chunk.contents = Buffer.from(JSON.stringify(json))
 

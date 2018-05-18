@@ -3,8 +3,8 @@
 require('lodash')
 //
 var abc = require('react')
-// console.log('=== abc:',abc)
-//
+console.log('=== abc:',abc)
+//  123
 require('redux')
 
 require('react-redux')

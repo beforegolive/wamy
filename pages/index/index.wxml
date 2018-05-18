@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="container">
   <view>
-    <navigator url='../customComponent/index'>自定义组件</navigator>
+    <navigator url='../customComponent/index'>自定义组件12334</navigator>
   </view>
   <view class="userinfo">
     <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
