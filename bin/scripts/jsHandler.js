@@ -78,8 +78,13 @@ gulp.task('handle_js', function() {
       babel({
         presets: ['@babel/env'],
         plugins: [
+          ['@babel/transform-runtime', {
+          helpers: false,
+          polyfill: false,
+          regenerator: true, }],
           '@babel/plugin-proposal-object-rest-spread',
-          'transform-class-properties'
+          'transform-class-properties',
+          'syntax-async-functions'
         ]
       })
     )

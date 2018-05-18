@@ -2,12 +2,15 @@
 // require("../../lib/babel-polyfill")
 // require('lodash')
 //
-var abc = require('react')
+
+require('babel-polyfill')
+
+// var abc = require('react')
 console.log('=== abc:',abc)
 //  123
-require('redux')
+// require('redux')
 
-require('react-redux')
+// require('react-redux')
 Page({
 
   /**
@@ -28,7 +31,7 @@ class A {
 class B extends A {
   static data={myName:'abc'}
 
-  // async customLoad(){
-  //   console.log('=== customLoad:',)
-  // }
+  async customLoad(){
+    console.log('=== customLoad:',)
+  }
 }
