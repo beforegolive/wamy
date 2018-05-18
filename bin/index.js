@@ -26,24 +26,24 @@ program
 
       if(options.watch){
         console.log('======= now is watch mode',)
+        gulp.watch([
+          '**/*.json',
+          '**/*.wxml',
+          '**/*.wxss',
+          '**/*.png',
+          '**/*.jpg',
+          '**/*.gif',
+          '!node_modules/**',
+          '!_dist/**',
+          '!project.config.json',
+          '!package.json',
+          '!package-lock.json'
+        ], gulp.series('notjs'), function(done){
+          console.log('==== notjs updated',)
+          done()
+        })
       }
 
-      gulp.watch([
-        '**/*.json',
-        '**/*.wxml',
-        '**/*.wxss',
-        '**/*.png',
-        '**/*.jpg',
-        '**/*.gif',
-        '!node_modules/**',
-        '!_dist/**',
-        '!project.config.json',
-        '!package.json',
-        '!package-lock.json'
-      ], gulp.series('notjs'), function(done){
-        console.log('==== notjs updated',)
-        done()
-      })
 
       // gulp.watch([
       //   '**/*.js',

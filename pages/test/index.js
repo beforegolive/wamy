@@ -20,15 +20,15 @@ Page({
 
 })
 
-// class A {
-//   myName(){}
-//   data=123
-// }
+class A {
+  myName(){}
+  data=123
+}
 
-// class B extends A {
-//   static data={myName:'abc'}
+class B extends A {
+  static data={myName:'abc'}
 
-//   // async customLoad(){
-//   //   console.log('=== customLoad:',)
-//   // }
-// }
+  // async customLoad(){
+  //   console.log('=== customLoad:',)
+  // }
+}
