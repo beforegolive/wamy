@@ -12,17 +12,25 @@ const glob = require('glob')
 const rimraf = require('rimraf')
 const strip = require('gulp-strip-comments')
 
+function moveForwardOfRelativePath(relativePath){
+  // posix格式下移除前3个字符:  ../../
+  // 如果是window则要移除4个: ..\\..\\
+  return relativePath.substr(3)
+}
+
 const targetFolder = path.resolve(process.cwd() + '/_dist')
 
 const npmFolder = path.resolve(process.cwd() + '/_dist/npm')
 const webpackConfigPath = path.resolve(process.cwd(), 'webpack.config.js')
+
+const rootPath = process.cwd()
 
 let dependencies = []
 
 const extractAllDeps = through2.obj(function(chunk, env, cb) {
   let contents = chunk.contents.toString()
   // named capturing group is not supported in js regex.
-  const requireRegex = /require\((['"])([^.\\][^'"]+)\1\)/gm
+  const requireRegex = /(require\()(['"])([^.\\][^'"]+)(\2\))/gm
 
   let result
   let i = 0
@@ -30,10 +38,17 @@ const extractAllDeps = through2.obj(function(chunk, env, cb) {
     result = requireRegex.exec(contents)
     if (!!result) {
       // get dep name in groups
-      let depName = result[2]
+      let depName = result[3]
       dependencies.push(depName)
     }
   } while (result)
+
+  let relativePath = path.relative(chunk.path, rootPath)
+  relativePath = moveForwardOfRelativePath(relativePath)
+  let relativeToNpm = relativePath+'/npm/'
+
+  contents = contents.replace(requireRegex, `$1$2${relativeToNpm}$3$4`)
+  chunk.contents = Buffer.from(contents)
 
   this.push(chunk)
   cb()
@@ -126,6 +141,13 @@ gulp.task(
 gulp.task(
   'notjs',
   gulp.series('notjs', 'config', 'ignore', function(done){
+    done()
+  })
+)
+
+gulp.task(
+  'all',
+  gulp.series('js', 'notjs', function(done){
     done()
   })
 )

@@ -1,6 +1,6 @@
 // pages/test/index.js
 // require("../../lib/babel-polyfill")
-require('lodash')
+// require('lodash')
 //
 var abc = require('react')
 console.log('=== abc:',abc)
