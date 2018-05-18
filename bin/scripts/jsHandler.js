@@ -43,11 +43,19 @@ const extractAllDeps = through2.obj(function(chunk, env, cb) {
     }
   } while (result)
 
+  // ======== handle module name with slash, like: lodash/map, babel-core/register
+
+
   let relativePath = path.relative(chunk.path, rootPath)
   relativePath = moveForwardOfRelativePath(relativePath)
   let relativeToNpm = relativePath+'/npm/'
 
-  contents = contents.replace(requireRegex, `$1$2${relativeToNpm}$3$4`)
+  // contents = contents.replace(requireRegex, `$1$2${relativeToNpm}$3$4`)
+  contents = contents.replace(requireRegex, function(...args){
+    const moduleName = args[3].replace('/','_')
+    return `${args[1]}${args[2]}${relativeToNpm}${moduleName}${args[4]}`
+  })
+
   chunk.contents = Buffer.from(contents)
 
   this.push(chunk)
@@ -85,7 +93,11 @@ gulp.task('extract_require', function(done) {
     try {
       let dep = require(item)
       let content = `module.exports = require('${item}')`
-      fs.writeFileSync(`${npmFolder}/${item}.js`, content)
+
+      // 将模块中的斜线换成下划线
+      let moduleName = item.replace('/', '_')
+
+      fs.writeFileSync(`${npmFolder}/${moduleName}.js`, content)
     } catch (e) {}
   })
 
