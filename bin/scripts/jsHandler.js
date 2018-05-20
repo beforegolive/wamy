@@ -12,7 +12,7 @@ const glob = require('glob')
 const rimraf = require('rimraf')
 const strip = require('gulp-strip-comments')
 
-function moveForwardOfRelativePath(relativePath){
+function moveForwardOfRelativePath(relativePath) {
   // posix格式下移除前3个字符:  ../../
   // 如果是window则要移除4个: ..\\..\\
   return relativePath.substr(3)
@@ -45,14 +45,13 @@ const extractAllDeps = through2.obj(function(chunk, env, cb) {
 
   // ======== handle module name with slash, like: lodash/map, babel-core/register
 
-
   let relativePath = path.relative(chunk.path, rootPath)
   relativePath = moveForwardOfRelativePath(relativePath)
-  let relativeToNpm = relativePath+'/npm/'
+  let relativeToNpm = relativePath + '/npm/'
 
   // contents = contents.replace(requireRegex, `$1$2${relativeToNpm}$3$4`)
-  contents = contents.replace(requireRegex, function(...args){
-    const moduleName = args[3].replace('/','_')
+  contents = contents.replace(requireRegex, function(...args) {
+    const moduleName = args[3].replace('/', '_')
     return `${args[1]}${args[2]}${relativeToNpm}${moduleName}${args[4]}`
   })
 
@@ -76,15 +75,12 @@ gulp.task('handle_js', function() {
     .pipe(extractAllDeps)
     .pipe(
       babel({
-        presets: ['@babel/env'],
+        presets: ['es2015'],
         plugins: [
-          ['@babel/transform-runtime', {
-          helpers: false,
-          polyfill: false,
-          regenerator: true, }],
-          '@babel/plugin-proposal-object-rest-spread',
           'transform-class-properties',
-          'syntax-async-functions'
+          'syntax-async-functions',
+          'transform-regenerator',
+          'transform-async-to-generator'
         ]
       })
     )
@@ -157,14 +153,14 @@ gulp.task(
 
 gulp.task(
   'notjs',
-  gulp.series('notjs', 'config', 'ignore', function(done){
+  gulp.series('notjs', 'config', 'ignore', function(done) {
     done()
   })
 )
 
 gulp.task(
   'all',
-  gulp.series('js', 'notjs', function(done){
+  gulp.series('js', 'notjs', function(done) {
     done()
   })
 )
