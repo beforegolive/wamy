@@ -10,7 +10,6 @@ const configureStore = (initialState) => {
 	const store = createStore(reducers, enhancer)
 
 	sagaMiddleware.run(rootSaga)
-
 	return store
 }
 

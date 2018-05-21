@@ -7,8 +7,9 @@
     "pages/tab1/index",
     "pages/tab2/index",
     "pages/customComponent/index",
-    "pages/reduxPage/index"
-  ],
+    "pages/reduxPage/index",
+    "pages/myPage/index"
+    ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
