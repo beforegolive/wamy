@@ -8,7 +8,8 @@
     "pages/tab2/index",
     "pages/customComponent/index",
     "pages/reduxPage/index",
-    "pages/myPage/index"
+    "pages/myPage/index",
+    "pages/myPage1/index"
     ],
   "window": {
     "backgroundTextStyle": "light",

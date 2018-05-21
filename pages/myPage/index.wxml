@@ -1,2 +1,9 @@
 <!--pages/myPage.wxml-->
 <text>pages/myPage.wxml</text>
+<view>
+  <text>myName: {{myName}}</text>
+</view>
+<view>
+  <text>name: {{name}}</text>
+</view>
+<button bindtap="logFunction">显示console.log</button>

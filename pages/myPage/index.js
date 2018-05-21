@@ -1,29 +1,17 @@
-// pages/myPage.js
+
 import wamy from '../../core/index'
 
-export default MyCustomPage extends wamy.page{
-  
-}
+export default class MyPage extends wamy.page{
+  data= {
+    name: 123,
+    myName: 'abc'
+  }
 
-// Component({
-//   /**
-//    * 组件的属性列表
-//    */
-//   properties: {
-//
-//   },
-//
-//   /**
-//    * 组件的初始数据
-//    */
-//   data: {
-//
-//   },
-//
-//   /**
-//    * 组件的方法列表
-//    */
-//   methods: {
-//
-//   }
-// })
+  logFunction(){
+    console.log('===== logFunction:')
+  }
+
+  onLoad(){
+    console.log('======== MyPage onLoad 事件',)
+  }
+}

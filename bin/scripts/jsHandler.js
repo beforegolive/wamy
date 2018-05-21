@@ -60,23 +60,29 @@ const extractAllDeps = through2.obj(function(chunk, env, cb) {
   cb()
 })
 
-const customBabelTrasform = through2.obj(function(chunk, env, cb) {
-  let contents = chunk.contents.toString()
-  let babel = require(`${process.cwd()}/node_modules/babel-core`)
-  let babelConfig = {
-    presets: ['es2015', "stage-0"],
-    plugins: [
-      'transform-runtime',
-      // ['transform-runtime', {
-      //     helpers: false,
-      //     polyfill: true,
-      //     regenerator: true }],
-      // 'transform-regenerator'
-    ]
-  }
-  let compiledObj = babel.transform(contents, babelConfig)
+const createPage = (className, path) => {
+  console.log('====== className:', className)
+  var instance = new className()
+  instance.path = path
+  return instance
+}
 
-  chunk.contents = Buffer.from(compiledObj.code)
+const compileSubClassOfMyPage = through2.obj(function(chunk, env, cb) {
+  let contents = chunk.contents.toString()
+  // code.replace(/exports\.default\s*=\s*(\w+);/ig, function (m, defaultExport) {}
+  // \nPage(require('wepy').default.$createPage(${defaultExport} , '${pagePath}'));\n
+
+  contents = contents.replace(/exports\.default\s*=\s*(\w+);/ig, function (m, defaultExport) {
+    // 此处如何把所有继承myPage的类都拿出来？
+    if(chunk.path.indexOf('myPage')<=-1){
+      return m
+    }
+
+    return `Page(require('../../lib/wamy').default._createPage(${defaultExport}))`
+  })
+
+  chunk.contents = Buffer.from(contents)
+
   this.push(chunk)
   cb()
 })
@@ -89,7 +95,7 @@ gulp.task('handle_js', function() {
       '!node_modules/**',
       '!_dist/**',
       '!gulpfile.js',
-      '!webpack.config.js'
+      '!webpack.config.js',
     ])
     .pipe(strip())
     .pipe(
@@ -104,8 +110,8 @@ gulp.task('handle_js', function() {
         ]
       })
     )
-    // .pipe(customBabelTrasform)
     .pipe(extractAllDeps)
+    .pipe(compileSubClassOfMyPage)
 
     .pipe(gulp.dest(targetFolder))
 })
@@ -113,7 +119,7 @@ gulp.task('handle_js', function() {
 gulp.task('extract_require', function(done) {
   var fs = require('fs')
 
-  console.log('====== dependencies:', dependencies)
+  // console.log('====== dependencies:', dependencies)
   dependencies.forEach(item => {
     try {
       let dep = require(item)
@@ -121,7 +127,7 @@ gulp.task('extract_require', function(done) {
 
       // 将模块中的斜线换成下划线
       let moduleName = item.replace(/\//g, '_')
-      console.log('====== dependency path:', `${npmFolder}/${moduleName}.js`)
+      // console.log('====== dependency path:', `${npmFolder}/${moduleName}.js`)
       fs.writeFileSync(`${npmFolder}/${moduleName}.js`, content)
     } catch (e) {}
   })

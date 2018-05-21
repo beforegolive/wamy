@@ -1,11 +1,11 @@
 export function page(){
-	console.log('======= page()',)
-	return Page()
+	// this.prototype = Object.create(page.prototype)
+	// console.log('======= constructor, wamy.page():', this.prototype)
 }
 
 export function component(){
-	console.log('======= component()',)
-	return Component()
+	console.log('======= constructor, component()',)
+	// return Component()
 }
 
 export default {
