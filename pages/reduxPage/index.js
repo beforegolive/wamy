@@ -1,5 +1,5 @@
 // pages/reduxPage/index.js
-import { reducer2Action, thunkAction } from '../../reduxRelated/actions/index'
+import { reducer2Action, thunkAction, sagaAction } from '../../reduxRelated/actions/index'
 const app = getApp()
 const store = app.store
 console.log('=== reducer1:', store.getState().reducer1.switchValue)
@@ -30,6 +30,13 @@ Page({
     store.dispatch(action)
     console.log('====== reducer1 switchValue:', store.getState().reducer1.switchValue)
     console.log('====== reducer2 switchValue:', store.getState().reducer2.switchValue)
+  },
+
+  changeTwoReducersWithSaga() {
+    const action = sagaAction()
+    store.dispatch(action)
+    console.log('======Saga reducer1 switchValue:', store.getState().reducer1.switchValue)
+    console.log('======Saga reducer2 switchValue:', store.getState().reducer2.switchValue)
   },
 
   onLoad: function (options) {

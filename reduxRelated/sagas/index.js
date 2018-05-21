@@ -1,4 +1,4 @@
-import { put, takeEvery } from '../../lib/redux-saga'
+import { put, takeEvery } from 'redux-saga/effects'
 import { reducer1Action, reducer2Action } from '../actions/index'
 
 function* dispathTwoActions(action){
@@ -12,4 +12,4 @@ function* mySaga(){
 	yield takeEvery('sagaAction', dispathTwoActions)
 }
 
-// export default mySaga
+export default mySaga

@@ -3,6 +3,7 @@
 <button bindtap='changeReducer1'>切换reducer1</button>
 <button bindtap='clickButton'>切换reducer2</button>
 <button bindtap='changeTwoReducers'>切换两个Reducer</button>
+<button bindtap='changeTwoReducersWithSaga'>用Saga切换两个Reducer</button>
 <view>
 	<text>reducer1:{{valueOfReducer1}}</text>
 </view>

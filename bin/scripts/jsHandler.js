@@ -37,13 +37,11 @@ const extractAllDeps = through2.obj(function(chunk, env, cb) {
   do {
     result = requireRegex.exec(contents)
     if (!!result) {
-      // get dep name in groups
+      // get dep name in groups, refer to the regex above
       let depName = result[3]
       dependencies.push(depName)
     }
   } while (result)
-
-  // ======== handle module name with slash, like: lodash/map, babel-core/register
 
   let relativePath = path.relative(chunk.path, rootPath)
   relativePath = moveForwardOfRelativePath(relativePath)
@@ -51,12 +49,34 @@ const extractAllDeps = through2.obj(function(chunk, env, cb) {
 
   // contents = contents.replace(requireRegex, `$1$2${relativeToNpm}$3$4`)
   contents = contents.replace(requireRegex, function(...args) {
-    const moduleName = args[3].replace('/', '_')
+    // handle module name with slash, like: lodash/map, babel-core/register
+    const moduleName = args[3].replace(/\//g, '_')
     return `${args[1]}${args[2]}${relativeToNpm}${moduleName}${args[4]}`
   })
 
   chunk.contents = Buffer.from(contents)
 
+  this.push(chunk)
+  cb()
+})
+
+const customBabelTrasform = through2.obj(function(chunk, env, cb) {
+  let contents = chunk.contents.toString()
+  let babel = require(`${process.cwd()}/node_modules/babel-core`)
+  let babelConfig = {
+    presets: ['es2015', "stage-0"],
+    plugins: [
+      'transform-runtime',
+      // ['transform-runtime', {
+      //     helpers: false,
+      //     polyfill: true,
+      //     regenerator: true }],
+      // 'transform-regenerator'
+    ]
+  }
+  let compiledObj = babel.transform(contents, babelConfig)
+
+  chunk.contents = Buffer.from(compiledObj.code)
   this.push(chunk)
   cb()
 })
@@ -72,32 +92,36 @@ gulp.task('handle_js', function() {
       '!webpack.config.js'
     ])
     .pipe(strip())
-    .pipe(extractAllDeps)
     .pipe(
       babel({
-        presets: ['es2015'],
+        presets: ['es2015', "stage-0"],
         plugins: [
-          'transform-class-properties',
-          'syntax-async-functions',
-          'transform-regenerator',
-          'transform-async-to-generator'
+          'transform-runtime',
+          // 'transform-class-properties',
+          // 'syntax-async-functions',
+          // 'transform-regenerator',
+          // 'transform-async-to-generator'
         ]
       })
     )
+    // .pipe(customBabelTrasform)
+    .pipe(extractAllDeps)
+
     .pipe(gulp.dest(targetFolder))
 })
 
 gulp.task('extract_require', function(done) {
   var fs = require('fs')
 
+  console.log('====== dependencies:', dependencies)
   dependencies.forEach(item => {
     try {
       let dep = require(item)
       let content = `module.exports = require('${item}')`
 
       // 将模块中的斜线换成下划线
-      let moduleName = item.replace('/', '_')
-
+      let moduleName = item.replace(/\//g, '_')
+      console.log('====== dependency path:', `${npmFolder}/${moduleName}.js`)
       fs.writeFileSync(`${npmFolder}/${moduleName}.js`, content)
     } catch (e) {}
   })
