@@ -6,4 +6,7 @@
 <view>
   <text>name: {{name}}</text>
 </view>
+<view>
+  <button bindtap='asyncLog'>执行 asyncLog </button>
+</view>
 <button bindtap="logFunction">显示console.log</button>
