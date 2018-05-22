@@ -73,6 +73,10 @@ const compileSubClassOfMyPage = through2.obj(function(chunk, env, cb) {
   // \nPage(require('wepy').default.$createPage(${defaultExport} , '${pagePath}'));\n
 
   contents = contents.replace(/exports\.default\s*=\s*(\w+);/ig, function (m, defaultExport) {
+    // 针对加入transform-decorators-legacy以后出现的 exports.default = undefined;
+    if(defaultExport === 'undefined'){
+      return m
+    }
     // 此处如何把所有继承myPage的类都拿出来？
     if(chunk.path.indexOf('myPage')<=-1){
       return m
@@ -97,12 +101,13 @@ gulp.task('handle_js', function() {
       '!gulpfile.js',
       '!webpack.config.js',
     ])
-    .pipe(strip())
+    // .pipe(strip())
     .pipe(
       babel({
         presets: ['es2015', "stage-0"],
         plugins: [
           'transform-runtime',
+          'transform-decorators-legacy',
           // 'transform-class-properties',
           // 'syntax-async-functions',
           // 'transform-regenerator',

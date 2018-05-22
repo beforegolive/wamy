@@ -10,3 +10,4 @@
   <button bindtap='asyncLog'>执行 asyncLog </button>
 </view>
 <button bindtap="logFunction">显示console.log</button>
+<button bindtap="invokeWrapperMethod">调用wrapper方法</button>

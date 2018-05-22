@@ -10,6 +10,17 @@ function getPromise(){
   })
 }
 
+function wrapper(){
+  return function(target){
+    console.log('==========*** target:', target)
+    target.prototype.wrapperName='wrapper'
+    target.prototype.getWrapperName = function(){
+      return 'wrapper'
+    }
+  }
+}
+
+@wrapper()
 export default class MyPage extends wamy.page{
   data= {
     name: 123,
@@ -28,5 +39,10 @@ export default class MyPage extends wamy.page{
     console.log('===== asyncLog start',)
     const promiseValue = await getPromise()
     console.log('===', promiseValue)
+  }
+
+  invokeWrapperMethod(){
+    var name = this.getWrapperName()
+    console.log('=== invokeWrapperMethod value:', name)
   }
 }
