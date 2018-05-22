@@ -10,6 +10,22 @@ function getPromise(){
   })
 }
 
+// const mapStateToProps = state => {
+//   return {
+//     name: state.reducer1.name,
+//     mySelf: state.reducer2.my
+//   }
+// }
+//
+// const mapDispatchToProps = state
+
+
+// 这种方式的wrapper操作的结果是：给target类创造了一个继承它的子类，并返回对应的实例
+// subType ---> target ---> super_target
+//
+// 注意事项：
+// 1. subType实例的构造函数访问到的是subType函数的prototype, 之前target变成了prototype第二层。
+// 2. subType的实例包含MyPage中定义的属性。
 function wrapper(){
   return function(target){
     console.log('==========*** target:', target)
@@ -17,6 +33,15 @@ function wrapper(){
     target.prototype.getWrapperName = function(){
       return 'wrapper'
     }
+
+    // class subType extends target {
+    //   myName='123456'
+    // }
+    //
+    // subType.prototype.nameSub = '345'
+    // subType.prototype.getMyName = function(){ return 'subtype'}
+    //
+    // return subType
   }
 }
 
