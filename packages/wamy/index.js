@@ -4,7 +4,6 @@ export function page(){
 }
 
 export function component(){
-	console.log('======= constructor, component()',)
 	// return Component()
 }
 
