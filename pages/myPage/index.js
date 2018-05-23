@@ -26,7 +26,6 @@ function getPromise() {
 // 2. subType的实例包含MyPage中定义的属性。
 function wrapper() {
   return function(target) {
-    console.log('==========*** target:', target)
     target.prototype.wrapperName = 'wrapper'
     target.prototype.getWrapperName = function() {
       return 'wrapper'

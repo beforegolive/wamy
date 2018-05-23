@@ -1,5 +1,7 @@
 import configureStore from './reduxRelated/configureStore/index'
+import { setStore } from './wamy-redux/store'
 const store = configureStore()
+setStore(store)
 // const store= 123
 //app.js
 App({

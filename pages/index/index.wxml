@@ -20,6 +20,7 @@
   <navigator url='../lifescope/index'>跳到生命周期页</navigator>
   <navigator url='../tab1/index' open-type='switchTab'>跳到Tab1页</navigator>
   <navigator url='../myPage/index'>跳到自定义page组件页</navigator>
+  <navigator url='../myPage1/index'>跳到自定义page1组件页</navigator>
   <view class="usermotto">
     <text class="user-motto">{{motto}}</text>
   </view>

@@ -11,3 +11,4 @@
 </view>
 <button bindtap="logFunction">显示console.log</button>
 <button bindtap="invokeWrapperMethod">调用wrapper方法</button>
+<navigator url='../myPage1/index'>跳转到myPage1页面</navigator>
