@@ -1,5 +1,4 @@
 const createPage = (className, path) => {
-	console.log('=**====== className:', className)
   var instance = new className()
 
 	// ES class中定义的方法会被附加在类的prototype上，因此要把方法抽出来放到当前实例上
