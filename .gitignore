@@ -1,3 +1,5 @@
 node_modules/
 
 _dist/
+
+lerna-debug.log
