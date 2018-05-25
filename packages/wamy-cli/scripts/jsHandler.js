@@ -14,7 +14,6 @@ const strip = require('gulp-strip-comments')
 const plumber = require('gulp-plumber')
 const webpack = require('webpack')
 
-
 let relativeToNpm = ''
 
 function moveForwardOfRelativePath(relativePath) {
@@ -82,13 +81,16 @@ const compileSubClassOfMyPage = through2.obj(function(chunk, env, cb) {
   // code.replace(/exports\.default\s*=\s*(\w+);/ig, function (m, defaultExport) {}
   // \nPage(require('wepy').default.$createPage(${defaultExport} , '${pagePath}'));\n
 
-  contents = contents.replace(/exports\.default\s*=\s*(\w+);/ig, function (m, defaultExport) {
+  contents = contents.replace(/exports\.default\s*=\s*(\w+);/gi, function(
+    m,
+    defaultExport
+  ) {
     // 针对加入transform-decorators-legacy以后出现的 exports.default = undefined;
-    if(defaultExport === 'undefined'){
+    if (defaultExport === 'undefined') {
       return m
     }
     // 此处如何把所有继承myPage的类都拿出来？
-    if(chunk.path.indexOf('myPage')<=-1){
+    if (chunk.path.indexOf('myPage') <= -1) {
       return m
     }
     // console.log('============ relativeToNpm:', `require('${relativeToNpm}wamy')`)
@@ -101,51 +103,106 @@ const compileSubClassOfMyPage = through2.obj(function(chunk, env, cb) {
   cb()
 })
 
-gulp.task('handle_js', function() {
-  return gulp
-    .src([
-      '**/*.js',
-      '!bin/**',
-      '!node_modules/**',
-      '!_dist/**',
-      '!gulpfile.js',
-      '!webpack.config.js',
-    ])
-    // .pipe(strip())
-    .pipe(plumber())
-    .pipe(
-      babel({
-        presets: ['es2015', "stage-0"],
-        plugins: [
-          'transform-runtime',
-          'transform-decorators-legacy',
-          // 'transform-class-properties',
-          // 'syntax-async-functions',
-          // 'transform-regenerator',
-          // 'transform-async-to-generator'
-        ]
-      })
-    )
-    .pipe(extractAllDeps)
-    .pipe(compileSubClassOfMyPage)
+const babelCompiler = through2.obj(function(chunk, env, cb) {
+  try {
+    const babel = require('babel-core')
+    let contents = chunk.contents.toString()
+    let result = babel.transform(contents, {
+      presets: [require.resolve('babel-preset-es2015')],
+      plugins: [
+        require.resolve('babel-plugin-transform-class-properties'),
+        require.resolve('babel-plugin-transform-decorators-legacy')
+      ]
+    })
 
-    .pipe(gulp.dest(targetFolder))
+    chunk.contents = Buffer.from(result.code)
+    this.push(chunk)
+    cb()
+  } catch (e) {
+    console.log('======= babelCompiler error:', e)
+  }
 })
 
-gulp.task('write_deps_to_files', function(done){
-  // 此处用try-catch把gulp以外的处理逻辑异常显示出来。
-  try{
-    dependencies.forEach(item => {
-        console.log('======== dependency name:', item)
-        // let dep = require(item)
-        let content = `module.exports = require('${item}')`
+gulp.task('handle_js', function(done) {
+  // require.resolve('babel-preset-es2015'),
+  var webpack = require('webpack-stream')
+  var babel_loader = require('babel-loader')
+  // var babel = require()
+  console.log(
+    `=====require.resolve('webpack-stream').path:`,
+    require.resolve('webpack-stream')
+  )
+  console.log(
+    `=====require.resolve('babel-loader').path:`,
+    require.resolve('babel-loader')
+  )
 
-        // 将模块中的斜线换成下划线
-        let moduleName = item.replace(/\//g, '_')
-        // console.log('====== dependency path:', `${npmFolder}/${moduleName}.js`)
-        fs.writeFileSync(`${npmFolder}/${moduleName}.js`, content)
+  // console.log("======= require.resolve('transform-class-properties')",require.resolve('transform-class-properties'))
+
+  const configObj = {
+    watch: false,
+    module: {
+      loaders: [
+        {
+          test: /\.js/,
+          loader: require.resolve('babel-loader'),
+          options: {
+            presets: [require.resolve('babel-preset-es2015')],
+            plugins: [
+              require.resolve('babel-plugin-transform-class-properties'),
+              require.resolve('babel-plugin-transform-decorators-legacy')
+            ]
+          }
+        }
+      ]
+    }
+  }
+
+  return (gulp
+      .src([
+        '**/*.js',
+        '!bin/**',
+        '!node_modules/**',
+        '!_dist/**',
+        '!gulpfile.js',
+        '!webpack.config.js'
+      ])
+      .pipe(plumber())
+      .pipe(babelCompiler)
+      // .pipe(webpack(configObj))
+      // .pipe(
+      //   babel({
+      //     presets: ['es2015', 'stage-0'],
+      //     plugins: [
+      //       'transform-runtime',
+      //       'transform-decorators-legacy'
+      //       // 'transform-class-properties',
+      //       // 'syntax-async-functions',
+      //       // 'transform-regenerator',
+      //       // 'transform-async-to-generator'
+      //     ]
+      //   })
+      // )
+      .pipe(extractAllDeps)
+      .pipe(compileSubClassOfMyPage)
+
+      .pipe(gulp.dest(targetFolder)) )
+})
+
+gulp.task('write_deps_to_files', function(done) {
+  // 此处用try-catch把gulp以外的处理逻辑异常显示出来。
+  try {
+    dependencies.forEach(item => {
+      console.log('======== dependency name:', item)
+      // let dep = require(item)
+      let content = `module.exports = require('${item}')`
+
+      // 将模块中的斜线换成下划线
+      let moduleName = item.replace(/\//g, '_')
+      // console.log('====== dependency path:', `${npmFolder}/${moduleName}.js`)
+      fs.writeFileSync(`${npmFolder}/${moduleName}.js`, content)
     })
-  }catch(e){
+  } catch (e) {
     console.error(e)
   }
 
@@ -155,42 +212,36 @@ gulp.task('write_deps_to_files', function(done){
 gulp.task('extract_require', function(done) {
   let webpackConfig
   // 此处用try-catch把gulp以外的处理逻辑异常显示出来。
-  try{
-  var npmPath = path.resolve(process.cwd() + '/_dist/npm/*.js')
-  var files = glob.sync(npmPath);
-  var entry = {};
-  for (var i in files) {
-    var obj = path.parse(files[i]);
-    entry[obj.name] = files[i];
-  }
-   webpackConfig = {
-    entry,
-    output: {
-      path: path.resolve(process.cwd(), '_dist/npm/'),
-      filename: '[name].js',
-      libraryTarget: 'umd'
+  try {
+    var npmPath = path.resolve(process.cwd() + '/_dist/npm/*.js')
+    var files = glob.sync(npmPath)
+    var entry = {}
+    for (var i in files) {
+      var obj = path.parse(files[i])
+      entry[obj.name] = files[i]
     }
-  	// plugins: [
-    //   new webpack.optimize.UglifyJsPlugin({
-    //     comments: false, //去除注释
-    //     compress: {
-    //       warnings: false //忽略警告
-    //     }
-    //   })
-    // ]
-  }
 
-} catch(e){
-  console.log('==== e:',e)
-  throw e
-}
+    webpackConfig = {
+      entry,
+      output: {
+        path: path.resolve(process.cwd(), '_dist/npm/'),
+        filename: '[name].js',
+        libraryTarget: 'umd'
+      }
+    }
+
+    console.log('========== webpackConfig:', webpackConfig)
+  } catch (e) {
+    console.log('==== e:', e)
+    throw e
+  }
   done() // done调用后，异常才能被正常显示。
-  return gulp
-    .src(`${npmFolder}/*.js`)
-    .pipe(plumber())
-    // .pipe(webpack(require(webpackConfigPath)))
-    .pipe(webpackStream(webpackConfig))
-    .pipe(gulp.dest(npmFolder))
+  return (gulp
+      .src(`${npmFolder}/*.js`)
+      .pipe(plumber())
+      // .pipe(webpack(require(webpackConfigPath)))
+      .pipe(webpackStream(webpackConfig))
+      .pipe(gulp.dest(npmFolder)) )
 })
 
 gulp.task('init', function(done) {
@@ -231,9 +282,15 @@ gulp.task('notjs', function() {
 
 gulp.task(
   'js',
-  gulp.series('init', 'handle_js', 'write_deps_to_files', 'extract_require', function(done) {
-    done()
-  })
+  gulp.series(
+    'init',
+    'handle_js',
+    'write_deps_to_files',
+    'extract_require',
+    function(done) {
+      done()
+    }
+  )
 )
 
 gulp.task(
