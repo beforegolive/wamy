@@ -21,7 +21,6 @@ program
   // .description('编译当前项目')
   .option('-w, --watch', 'watch mode')
   .action(function(options) {
-    console.log('============ 123 notjs',)
     return gulp.series(
       'js',
       'notjs',

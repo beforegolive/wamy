@@ -15,6 +15,8 @@ const plumber = require('gulp-plumber')
 const webpack = require('webpack')
 
 
+let relativeToNpm = ''
+
 function moveForwardOfRelativePath(relativePath) {
   // posix格式下移除前3个字符:  ../../
   // 如果是window则要移除4个: ..\\..\\
@@ -34,6 +36,8 @@ const rootPath = process.cwd()
 let dependencies = []
 
 const extractAllDeps = through2.obj(function(chunk, env, cb) {
+  console.log('====== chunk.path:', chunk.path)
+
   let contents = chunk.contents.toString()
   // named capturing group is not supported in js regex.
   const requireRegex = /(require\()(['"])([^.\\][^'"]+)(\2\))/gm
@@ -51,7 +55,7 @@ const extractAllDeps = through2.obj(function(chunk, env, cb) {
 
   let relativePath = path.relative(chunk.path, rootPath)
   relativePath = moveForwardOfRelativePath(relativePath)
-  let relativeToNpm = relativePath + '/npm/'
+  relativeToNpm = relativePath + '/npm/'
 
   // contents = contents.replace(requireRegex, `$1$2${relativeToNpm}$3$4`)
   contents = contents.replace(requireRegex, function(...args) {
@@ -87,8 +91,8 @@ const compileSubClassOfMyPage = through2.obj(function(chunk, env, cb) {
     if(chunk.path.indexOf('myPage')<=-1){
       return m
     }
-
-    return `Page(require('../../lib/wamy').default._createPage(${defaultExport}))`
+    // console.log('============ relativeToNpm:', `require('${relativeToNpm}wamy')`)
+    return `Page(require('${relativeToNpm}wamy').default._createPage(${defaultExport}))`
   })
 
   chunk.contents = Buffer.from(contents)
@@ -132,15 +136,14 @@ gulp.task('write_deps_to_files', function(done){
   // 此处用try-catch把gulp以外的处理逻辑异常显示出来。
   try{
     dependencies.forEach(item => {
-      try {
-        let dep = require(item)
+        console.log('======== dependency name:', item)
+        // let dep = require(item)
         let content = `module.exports = require('${item}')`
 
         // 将模块中的斜线换成下划线
         let moduleName = item.replace(/\//g, '_')
         // console.log('====== dependency path:', `${npmFolder}/${moduleName}.js`)
         fs.writeFileSync(`${npmFolder}/${moduleName}.js`, content)
-      } catch (e) {}
     })
   }catch(e){
     console.error(e)
