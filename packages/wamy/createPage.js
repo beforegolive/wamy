@@ -13,6 +13,4 @@ const createPage = (className, path) => {
   return instance
 }
 
-export default {
-  _createPage: createPage
-}
+export default createPage

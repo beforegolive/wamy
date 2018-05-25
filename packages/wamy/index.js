@@ -1,3 +1,4 @@
+import createPage from './createPage'
 export function page(){
 	// this.prototype = Object.create(page.prototype)
 	// console.log('======= constructor, wamy.page():', this.prototype)
@@ -9,5 +10,6 @@ export function component(){
 
 export default {
 	page,
-	component
+	component,
+	_createPage: createPage
 }
