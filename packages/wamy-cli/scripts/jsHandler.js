@@ -110,10 +110,20 @@ const babelCompiler = through2.obj(function(chunk, env, cb) {
     let result = babel.transform(contents, {
       presets: [require.resolve('babel-preset-es2015')],
       plugins: [
+        [require.resolve('babel-plugin-transform-runtime'),{
+          "polyfill": false,
+          "regenerator": true
+        }],
         require.resolve('babel-plugin-transform-class-properties'),
-        require.resolve('babel-plugin-transform-decorators-legacy')
+        require.resolve('babel-plugin-transform-decorators-legacy'),
+        require.resolve('babel-plugin-syntax-async-functions'),
       ]
     })
+
+    // {
+    //   "polyfill": false,
+    //   "regenerator": true
+    // }
 
     chunk.contents = Buffer.from(result.code)
     this.push(chunk)
@@ -147,10 +157,14 @@ gulp.task('handle_js', function(done) {
           test: /\.js/,
           loader: require.resolve('babel-loader'),
           options: {
-            presets: [require.resolve('babel-preset-es2015')],
+            presets: [
+              require.resolve('babel-preset-es2015'),
+              require.resolve('babel-preset-stage-0'),
+            ],
             plugins: [
               require.resolve('babel-plugin-transform-class-properties'),
-              require.resolve('babel-plugin-transform-decorators-legacy')
+              require.resolve('babel-plugin-transform-decorators-legacy'),
+              require.resolve('babel-plugin-transform-regenerator')
             ]
           }
         }
@@ -158,8 +172,10 @@ gulp.task('handle_js', function(done) {
     }
   }
 
-  return (gulp
-      .src([
+  const merge = require('gulp-merge')
+  const concat = require('gulp-concat');
+
+  return gulp.src([
         '**/*.js',
         '!bin/**',
         '!node_modules/**',
@@ -186,7 +202,7 @@ gulp.task('handle_js', function(done) {
       .pipe(extractAllDeps)
       .pipe(compileSubClassOfMyPage)
 
-      .pipe(gulp.dest(targetFolder)) )
+      .pipe(gulp.dest(targetFolder))
 })
 
 gulp.task('write_deps_to_files', function(done) {
