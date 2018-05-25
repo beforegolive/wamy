@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "wamy": "./bin/index.js"
+    "wamy": "./index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -41,12 +41,14 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "gulp-babel": "^7.0.1",
+    "gulp-plumber": "^1.2.0",
     "gulp-rename": "^1.2.3",
     "gulp-strip-comments": "^2.5.2",
     "gulp-uglify": "^3.0.0",
     "gulp-umd": "^2.0.0",
     "lerna": "^2.11.0",
     "rimraf": "^2.6.2",
+    "webpack": "^4.8.3",
     "webpack-stream": "^4.0.3"
   }
 }

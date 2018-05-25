@@ -6,11 +6,14 @@ const babel = require('gulp-babel')
 const through2 = require('through2')
 const rename = require('gulp-rename')
 const umd = require('gulp-umd')
-const webpack = require('webpack-stream')
+const webpackStream = require('webpack-stream')
 const uglify = require('gulp-uglify')
 const glob = require('glob')
 const rimraf = require('rimraf')
 const strip = require('gulp-strip-comments')
+const plumber = require('gulp-plumber')
+const webpack = require('webpack')
+
 
 function moveForwardOfRelativePath(relativePath) {
   // posix格式下移除前3个字符:  ../../
@@ -21,7 +24,10 @@ function moveForwardOfRelativePath(relativePath) {
 const targetFolder = path.resolve(process.cwd() + '/_dist')
 
 const npmFolder = path.resolve(process.cwd() + '/_dist/npm')
-const webpackConfigPath = path.resolve(process.cwd(), 'webpack.config.js')
+// const webpackConfigPath = path.resolve(process.cwd(), 'webpack.config.js')
+const webpackConfigPath = path.resolve('webpack.config.js')
+// const configObj = require('../../../webpack.config.js')
+// console.log('====== configObj:', configObj)
 
 const rootPath = process.cwd()
 
@@ -102,6 +108,7 @@ gulp.task('handle_js', function() {
       '!webpack.config.js',
     ])
     // .pipe(strip())
+    .pipe(plumber())
     .pipe(
       babel({
         presets: ['es2015', "stage-0"],
@@ -121,25 +128,65 @@ gulp.task('handle_js', function() {
     .pipe(gulp.dest(targetFolder))
 })
 
+gulp.task('write_deps_to_files', function(done){
+  // 此处用try-catch把gulp以外的处理逻辑异常显示出来。
+  try{
+    dependencies.forEach(item => {
+      try {
+        let dep = require(item)
+        let content = `module.exports = require('${item}')`
+
+        // 将模块中的斜线换成下划线
+        let moduleName = item.replace(/\//g, '_')
+        // console.log('====== dependency path:', `${npmFolder}/${moduleName}.js`)
+        fs.writeFileSync(`${npmFolder}/${moduleName}.js`, content)
+      } catch (e) {}
+    })
+  }catch(e){
+    console.error(e)
+  }
+
+  done()
+})
+
 gulp.task('extract_require', function(done) {
-  var fs = require('fs')
+  let webpackConfig
+  // 此处用try-catch把gulp以外的处理逻辑异常显示出来。
+  try{
+  var npmPath = path.resolve(process.cwd() + '/_dist/npm/*.js')
+  var files = glob.sync(npmPath);
+  var entry = {};
+  for (var i in files) {
+    var obj = path.parse(files[i]);
+    entry[obj.name] = files[i];
+  }
+   webpackConfig = {
+    entry,
+    output: {
+      path: path.resolve(process.cwd(), '_dist/npm/'),
+      filename: '[name].js',
+      libraryTarget: 'umd'
+    }
+  	// plugins: [
+    //   new webpack.optimize.UglifyJsPlugin({
+    //     comments: false, //去除注释
+    //     compress: {
+    //       warnings: false //忽略警告
+    //     }
+    //   })
+    // ]
+  }
 
-  // console.log('====== dependencies:', dependencies)
-  dependencies.forEach(item => {
-    try {
-      let dep = require(item)
-      let content = `module.exports = require('${item}')`
-
-      // 将模块中的斜线换成下划线
-      let moduleName = item.replace(/\//g, '_')
-      // console.log('====== dependency path:', `${npmFolder}/${moduleName}.js`)
-      fs.writeFileSync(`${npmFolder}/${moduleName}.js`, content)
-    } catch (e) {}
-  })
-
+} catch(e){
+  console.log('==== e:',e)
+  throw e
+}
+  done() // done调用后，异常才能被正常显示。
   return gulp
     .src(`${npmFolder}/*.js`)
-    .pipe(webpack(require(webpackConfigPath)))
+    .pipe(plumber())
+    // .pipe(webpack(require(webpackConfigPath)))
+    .pipe(webpackStream(webpackConfig))
     .pipe(gulp.dest(npmFolder))
 })
 
@@ -181,7 +228,7 @@ gulp.task('notjs', function() {
 
 gulp.task(
   'js',
-  gulp.series('init', 'handle_js', 'extract_require', function(done) {
+  gulp.series('init', 'handle_js', 'write_deps_to_files', 'extract_require', function(done) {
     done()
   })
 )

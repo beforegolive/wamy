@@ -21,11 +21,14 @@ program
   // .description('编译当前项目')
   .option('-w, --watch', 'watch mode')
   .action(function(options) {
-    gulp.series('js', 'notjs', function(done){
+    console.log('============ 123 notjs',)
+    return gulp.series(
+      'js',
+      'notjs',
+      function(done){
       done()
 
       if(options.watch){
-        console.log('======= now is watch mode',)
         gulp.watch([
           '**/*.json',
           '**/*.wxml',
