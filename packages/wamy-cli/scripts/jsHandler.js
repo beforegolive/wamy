@@ -103,17 +103,33 @@ const compileSubClassOfMyPage = through2.obj(function(chunk, env, cb) {
   cb()
 })
 
+const addRegeneratorRuntime = through2.obj(function(chunk,env,cb){
+  let contents = chunk.contents.toString()
+  console.log('====== require.resolve("regenerator-runtime/runtime")',require.resolve('regenerator-runtime/runtime'))
+  try {
+    if(chunk.path.indexOf('myPage') > -1){
+      let prefixText = `;var regeneratorRuntime=require('../../lib/runtime');`
+      let prefixBuffer = new Buffer(prefixText)
+      chunk.contents = Buffer.concat([prefixBuffer, chunk.contents])
+    }
+  } catch(e){
+    console.log('Error e:',e)
+  }
+  this.push(chunk)
+  cb()
+})
+
 const babelCompiler = through2.obj(function(chunk, env, cb) {
   try {
     const babel = require('babel-core')
     let contents = chunk.contents.toString()
     let result = babel.transform(contents, {
-      presets: [require.resolve('babel-preset-es2015')],
+      presets: [require.resolve('babel-preset-es2015','babel-preset-stage-0')],
       plugins: [
-        [require.resolve('babel-plugin-transform-runtime'),{
-          "polyfill": false,
-          "regenerator": true
-        }],
+        // [require.resolve('babel-plugin-transform-runtime'),{
+        //   "polyfill": false,
+        //   "regenerator": true
+        // }],
         require.resolve('babel-plugin-transform-class-properties'),
         require.resolve('babel-plugin-transform-decorators-legacy'),
         require.resolve('babel-plugin-syntax-async-functions'),
@@ -200,6 +216,7 @@ gulp.task('handle_js', function(done) {
       //   })
       // )
       .pipe(extractAllDeps)
+      .pipe(addRegeneratorRuntime)
       .pipe(compileSubClassOfMyPage)
 
       .pipe(gulp.dest(targetFolder))
