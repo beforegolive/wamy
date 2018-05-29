@@ -105,10 +105,10 @@ const compileSubClassOfMyPage = through2.obj(function(chunk, env, cb) {
 
 const addRegeneratorRuntime = through2.obj(function(chunk,env,cb){
   let contents = chunk.contents.toString()
-  console.log('====== require.resolve("regenerator-runtime/runtime")',require.resolve('regenerator-runtime/runtime'))
+  // console.log('====== require.resolve("regenerator-runtime/runtime")',require.resolve('regenerator-runtime/runtime'))
   try {
     if(chunk.path.indexOf('myPage') > -1){
-      let prefixText = `;var regeneratorRuntime=require('../../lib/runtime');`
+      let prefixText = `;var regeneratorRuntime=require('../../lib/runtime'); `
       let prefixBuffer = new Buffer(prefixText)
       chunk.contents = Buffer.concat([prefixBuffer, chunk.contents])
     }
@@ -180,7 +180,8 @@ gulp.task('handle_js', function(done) {
             plugins: [
               require.resolve('babel-plugin-transform-class-properties'),
               require.resolve('babel-plugin-transform-decorators-legacy'),
-              require.resolve('babel-plugin-transform-regenerator')
+              // require.resolve('babel-plugin-syntax-async-generators'),
+              // require.resolve('babel-plugin-transform-async-generator-functions')
             ]
           }
         }
@@ -200,6 +201,7 @@ gulp.task('handle_js', function(done) {
         '!webpack.config.js'
       ])
       .pipe(plumber())
+      .pipe(addRegeneratorRuntime)
       .pipe(babelCompiler)
       // .pipe(webpack(configObj))
       // .pipe(
@@ -216,7 +218,6 @@ gulp.task('handle_js', function(done) {
       //   })
       // )
       .pipe(extractAllDeps)
-      .pipe(addRegeneratorRuntime)
       .pipe(compileSubClassOfMyPage)
 
       .pipe(gulp.dest(targetFolder))
